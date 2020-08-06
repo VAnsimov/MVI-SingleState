@@ -16,8 +16,8 @@ class RootIntent: ObservableObject {
     private var rootModel: RootModel! { model as? RootModel }
     private var cancellable: Set<AnyCancellable> = []
 
-    init() {
-        self.model = RootModel()
+    init(model: RootModeling) {
+        self.model = model
         cancellable.insert(rootModel.objectWillChange.sink { self.objectWillChange.send() })
     }
 }
@@ -42,17 +42,14 @@ extension RootIntent {
                 self?.rootModel?.update(state: .show(image: image))
             }
         }
-
         task.resume()
     }
 
     func onTapImage() {
-        // 1
         guard let image = rootModel?.image else {
             rootModel?.routerSubject.send(.alert(title: "Error", message: "Failed to open the screen"))
             return
         }
-        // 2
-        model.routerSubject.send(.descriptionImage(image: image))
+        rootModel?.routerSubject.send(.descriptionImage(image: image))
     }
 }

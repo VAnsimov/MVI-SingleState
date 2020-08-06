@@ -24,7 +24,8 @@ struct RootView: View {
     }
 
     static func build() -> some View {
-        let intent = RootIntent()
+        let model = RootModel()
+        let intent = RootIntent(model: model)
         let view = RootView(intent: intent)
         return view
     }
