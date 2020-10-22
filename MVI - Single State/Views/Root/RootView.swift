@@ -10,11 +10,14 @@ import SwiftUI
 
 struct RootView: View {
 
-    @ObservedObject private var intent: RootIntent
+    @StateObject private var intent: RootIntent
 
     var body: some View {
         ZStack {
             imageView()
+                .cornerRadius(6)
+                .shadow(radius: 2)
+                .frame(width: 100, height: 100)
                 .onTapGesture(perform: intent.onTapImage)
             errorView()
             loadView()
@@ -27,6 +30,7 @@ struct RootView: View {
         let model = RootModel()
         let intent = RootIntent(model: model)
         let view = RootView(intent: intent)
+
         return view
     }
 }
@@ -35,24 +39,16 @@ struct RootView: View {
 private extension RootView {
 
     private func imageView() -> some View {
-        Group { () -> AnyView  in
-            if let image = intent.model.image {
-                return Image(uiImage: image)
-                    .resizable()
-                    .toAnyView()
-            } else {
-                return Color.gray.toAnyView()
-            }
-        }
-        .cornerRadius(6)
-        .shadow(radius: 2)
-        .frame(width: 100, height: 100)
+        guard let image = intent.model.image else { return Color.gray.toAnyView() }
+
+        return Image(uiImage: image)
+            .resizable()
+            .toAnyView()
     }
 
     private func loadView() -> some View {
-        guard intent.model.isLoading else {
-            return EmptyView().toAnyView()
-        }
+        guard intent.model.isLoading else { return EmptyView().toAnyView() }
+
         return ZStack {
             Color.white
             Text("Loading")
@@ -60,9 +56,8 @@ private extension RootView {
     }
 
     private func errorView() -> some View {
-        guard intent.model.error != nil else {
-            return EmptyView().toAnyView()
-        }
+        guard intent.model.error != nil else { return EmptyView().toAnyView() }
+
         return ZStack {
             Color.white
             Text("Fail")

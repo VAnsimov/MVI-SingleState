@@ -15,7 +15,7 @@ struct DescriptionImageView: View {
     }
     var action: (ViewActionType) -> Void
 
-    @ObservedObject private var intent: DescriptionImageViewIntent
+    @StateObject private var intent: DescriptionImageViewIntent
 
     var body: some View {
         VStack {
@@ -29,8 +29,11 @@ struct DescriptionImageView: View {
 
     static func build(image: UIImage?, action: @escaping (ViewActionType) -> Void) -> some View {
         guard let image = image else { return EmptyView().toAnyView() }
-        let intent = DescriptionImageViewIntent(image: image)
+
+        let model = DescriptionImageViewModel(image: image)
+        let intent = DescriptionImageViewIntent(model: model)
         let view = DescriptionImageView(action: action, intent: intent)
+
         return view.toAnyView()
     }
 }

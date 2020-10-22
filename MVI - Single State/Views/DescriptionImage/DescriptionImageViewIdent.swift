@@ -11,13 +11,14 @@ import Combine
 
 class DescriptionImageViewIntent: ObservableObject {
 
-    let model: DescriptionImageViewModeling
+    let model: DescriptionImageStateViewModel
 
-    private var sceneNameModel: DescriptionImageViewModel! { model as? DescriptionImageViewModel }
+    private var displayModel: DescriptionImageDisplayViewModel
     private var cancellable: Set<AnyCancellable> = []
 
-    init(image: UIImage) {
-        self.model = DescriptionImageViewModel(image: image)
-        cancellable.insert(sceneNameModel.objectWillChange.sink { self.objectWillChange.send() })
+    init(model: DescriptionImageViewModel) {
+        self.model = model
+        self.displayModel = model
+        cancellable.insert(model.objectWillChange.sink { self.objectWillChange.send() })
     }
 }

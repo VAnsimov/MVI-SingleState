@@ -9,14 +9,22 @@
 import SwiftUI
 import Combine
 
-protocol RootModeling {
+protocol RootStateModel {
     var image: UIImage? { get }
     var isLoading: Bool { get }
     var error: Error? { get }
     var routerSubject: PassthroughSubject<RootRouter.ScreenType, Never> { get }
 }
 
-class RootModel: ObservableObject, RootModeling {
+protocol RootDisplayModel {
+    func dispalyLoading()
+    func display(image: UIImage)
+    func dispaly(loadingFailError: Error)
+    func routeTodDescriptionImage()
+}
+
+// MARK: - RootModel
+class RootModel: ObservableObject, RootStateModel {
 
     enum StateType {
         case loading, show(image: UIImage), failLoad(error: Error)
@@ -27,21 +35,33 @@ class RootModel: ObservableObject, RootModeling {
     @Published private(set) var error: Error?
 
     let routerSubject = PassthroughSubject<RootRouter.ScreenType, Never>()
+}
 
-    func update(state: StateType) {
-        switch state {
-        case .loading:
-            isLoading = true
-            error = nil
-            image = nil
+// MARK: - RootDisplayModel
+extension RootModel: RootDisplayModel {
 
-        case .show(let image):
-            self.image = image
-            isLoading = false
+    func dispalyLoading() {
+        isLoading = true
+        error = nil
+        image = nil
+    }
 
-        case .failLoad(let error):
-            self.error = error
-            isLoading = false
+    func display(image: UIImage) {
+        self.image = image
+        isLoading = false
+    }
+
+    func dispaly(loadingFailError: Error) {
+        self.error = loadingFailError
+        isLoading = false
+        routerSubject.send(.alert(title: "Error", message: "It was not possible to upload a image"))
+    }
+
+    func routeTodDescriptionImage() {
+        guard let image = self.image else {
+            routerSubject.send(.alert(title: "Error", message: "Failed to open the screen"))
+            return
         }
+        routerSubject.send(.descriptionImage(image: image))
     }
 }

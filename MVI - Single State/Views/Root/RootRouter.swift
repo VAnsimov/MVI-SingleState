@@ -11,6 +11,7 @@ struct RootRouter: View {
     let screen: PassthroughSubject<ScreenType, Never>
 
     @State private var screenType: ScreenType? = nil
+
     @State private var isFullImageVisible = false
     @State private var isAlertVisible = false
 
