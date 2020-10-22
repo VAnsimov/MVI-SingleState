@@ -23,12 +23,8 @@ protocol RootDisplayModel {
     func routeTodDescriptionImage()
 }
 
-// MARK: - RootModel
+// MARK: - RootModel & RootStateModel
 class RootModel: ObservableObject, RootStateModel {
-
-    enum StateType {
-        case loading, show(image: UIImage), failLoad(error: Error)
-    }
 
     @Published private(set) var image: UIImage?
     @Published private(set) var isLoading: Bool = true

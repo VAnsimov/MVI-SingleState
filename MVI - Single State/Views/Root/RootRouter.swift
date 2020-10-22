@@ -11,48 +11,38 @@ struct RootRouter: View {
     let screen: PassthroughSubject<ScreenType, Never>
 
     @State private var screenType: ScreenType? = nil
-
-    @State private var isFullImageVisible = false
-    @State private var isAlertVisible = false
+    @State private var isVisibleScreen = false
 
     var body: some View {
-        Group {
-            alertView()
-            descriptionImageView()
-        }.onReceive(screen, perform: { type in
+        displayView().onReceive(screen, perform: { type in
             self.screenType = type
-            switch type {
-            case .alert:
-                self.isAlertVisible = true
-
-            case .descriptionImage:
-                self.isFullImageVisible = true
-            }
+            self.isVisibleScreen = true
         })
     }
 }
 
 private extension RootRouter {
 
-    private func alertView() -> some View {
-        guard let type = screenType, case .alert(let title, let message) = type else {
-            return EmptyView().toAnyView()
-        }
-        return Spacer().alert(isPresented: $isAlertVisible, content: {
-            Alert(title: Text(title), message: Text(message))
-        }).toAnyView()
-    }
+    private func displayView() -> some View {
+        switch screenType {
+        // Alert
+        case .alert(let title, let message):
+            return Spacer().alert(isPresented: $isVisibleScreen, content: {
+                Alert(title: Text(title), message: Text(message))
+            }).toAnyView()
 
-    private func descriptionImageView() -> some View {
-        guard let type = screenType, case .descriptionImage(let image) = type else {
+        // DescriptionImage
+        case .descriptionImage(let image):
+            return Spacer().sheet(isPresented: $isVisibleScreen, onDismiss: {
+                self.screenType = nil
+            }, content: {
+                DescriptionImageView.build(image: image, action: { _ in
+                    // code
+                })
+            }).toAnyView()
+
+        default:
             return EmptyView().toAnyView()
         }
-        return Spacer().sheet(isPresented: $isFullImageVisible, onDismiss: {
-            self.screenType = nil
-        }, content: {
-            DescriptionImageView.build(image: image, action: { _ in
-                // code
-            })
-        }).toAnyView()
     }
 }
