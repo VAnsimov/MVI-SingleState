@@ -13,17 +13,19 @@ struct RootView: View {
     @StateObject private var intent: RootIntent
 
     var body: some View {
-        ZStack {
-            imageView()
-                .cornerRadius(6)
-                .shadow(radius: 2)
-                .frame(width: 100, height: 100)
-                .onTapGesture(perform: intent.onTapImage)
-            errorView()
-            loadView()
+        NavigationView {
+            ZStack {
+                imageView()
+                    .cornerRadius(6)
+                    .shadow(radius: 2)
+                    .frame(width: 100, height: 100)
+                    .onTapGesture(perform: intent.onTapImage)
+                errorView()
+                loadView()
+            }
+            .overlay(RootRouter(screen: intent.model.routerSubject))
+            .onAppear(perform: intent.onAppear)
         }
-        .overlay(RootRouter(screen: intent.model.routerSubject))
-        .onAppear(perform: intent.onAppear)
     }
 
     static func build() -> some View {
