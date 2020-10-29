@@ -40,7 +40,7 @@ private extension RootRouter {
             return NavigationLink("", destination: DescriptionImageView.build(image: image),
                                   isActive: isVisibleScreen).toAnyView()
 
-        default:
+        case .none:
             return EmptyView().toAnyView()
         }
     }
