@@ -13,7 +13,9 @@ struct RootRouter: View {
     @State private var screenType: ScreenType? = nil
 
     var body: some View {
-        displayView().onReceive(screen) { self.screenType = $0 }
+        displayView().onReceive(screen, perform: {
+            self.screenType = $0
+        })
     }
 }
 
@@ -26,19 +28,17 @@ private extension RootRouter {
             if !$0 { screenType = nil }
         }
 
-        // Screens
         switch screenType {
+        // Alert
         case .alert(let title, let message):
             return Spacer().alert(isPresented: isVisibleScreen, content: {
                 Alert(title: Text(title), message: Text(message))
             }).toAnyView()
 
+        // DescriptionImage Screen
         case .descriptionImage(let image):
-            return Spacer().sheet(isPresented: isVisibleScreen, content: {
-                DescriptionImageView.build(image: image, action: { _ in
-                    // code
-                })
-            }).toAnyView()
+            return NavigationLink("", destination: DescriptionImageView.build(image: image),
+                                  isActive: isVisibleScreen).toAnyView()
 
         default:
             return EmptyView().toAnyView()

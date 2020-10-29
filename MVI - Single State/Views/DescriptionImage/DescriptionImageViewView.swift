@@ -10,29 +10,22 @@ import SwiftUI
 
 struct DescriptionImageView: View {
 
-    enum ViewActionType {
-        case didTapImage
-    }
-    var action: (ViewActionType) -> Void
-
     @StateObject private var intent: DescriptionImageViewIntent
 
     var body: some View {
         VStack {
-            imageView().onTapGesture(perform: {
-                self.action(.didTapImage)
-            })
+            imageView()
             textView()
             Spacer()
         }
     }
 
-    static func build(image: UIImage?, action: @escaping (ViewActionType) -> Void) -> some View {
+    static func build(image: UIImage?) -> some View {
         guard let image = image else { return EmptyView().toAnyView() }
 
         let model = DescriptionImageViewModel(image: image)
         let intent = DescriptionImageViewIntent(model: model)
-        let view = DescriptionImageView(action: action, intent: intent)
+        let view = DescriptionImageView(intent: intent)
 
         return view.toAnyView()
     }
@@ -57,9 +50,7 @@ private extension DescriptionImageView {
 // MARK: - Previews
 struct DescriptionImageView_Previews: PreviewProvider {
     static var previews: some View {
-        DescriptionImageView.build(image: nil, action: { _ in
-
-        })
+        DescriptionImageView.build(image: nil)
     }
 }
 #endif

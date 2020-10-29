@@ -17,6 +17,7 @@ protocol DescriptionImageStateViewModel {
 protocol DescriptionImageDisplayViewModel {
 }
 
+// MARK: - DescriptionImageViewModel & DescriptionImageStateViewModel
 class DescriptionImageViewModel: ObservableObject, DescriptionImageStateViewModel {
 
     @Published private(set) var image: UIImage
