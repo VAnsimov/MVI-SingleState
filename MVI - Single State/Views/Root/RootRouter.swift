@@ -45,3 +45,20 @@ private extension RootRouter {
         }
     }
 }
+
+#if DEBUG
+struct RootRouter_Previews: PreviewProvider {
+    static let routeSubject = PassthroughSubject<RootRouter.ScreenType, Never>()
+
+    static var previews: some View {
+        ZStack {
+            Color.white
+
+            Button(action: {
+                self.routeSubject.send(.alert(title: "Error", message: "Something went wrong"))
+            }, label: { Text("Display Screen") })
+        }
+        .overlay(RootRouter(screen: routeSubject))
+    }
+}
+#endif
