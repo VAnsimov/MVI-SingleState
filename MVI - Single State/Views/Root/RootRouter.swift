@@ -6,39 +6,54 @@ struct RootRouter: View {
     enum ScreenType {
         case alert(title: String, message: String)
         case descriptionImage(image: UIImage)
+        case exit
+    }
+    enum ActionType {
+        case dissmissed(screen: ScreenType)
     }
 
+    // MARK: API
+    var action: (ActionType) -> Void
     let screen: PassthroughSubject<ScreenType, Never>
 
+    // MARK: Private
+    @Environment(\.presentationMode) private var presentationMode
     @State private var screenType: ScreenType? = nil
 
+    // MARK: Live cycle
     var body: some View {
-        displayView().onReceive(screen, perform: {
-            self.screenType = $0
-        })
+        displayView().onReceive(screen) { self.screenType = $0 }
     }
 }
 
 private extension RootRouter {
 
     private func displayView() -> some View {
-        let isVisibleScreen = Binding<Bool> {
-            screenType != nil
-        } set: {
-            if !$0 { screenType = nil }
-        }
+        let isVisible = Binding<Bool>(get: { screenType != nil }, set: {
+            guard !$0 else { return }
+            if let type = screenType {
+                self.action(.dissmissed(screen: type))
+            }
+            screenType = nil
+        })
+        /* OR
+        let isVisible = Binding<Bool>(get: { screenType != nil },
+                                      set: { if !$0 { screenType = nil } })
+        */
 
         switch screenType {
-        // Alert
         case .alert(let title, let message):
-            return Spacer().alert(isPresented: isVisibleScreen, content: {
+            return Spacer().alert(isPresented: isVisible, content: {
                 Alert(title: Text(title), message: Text(message))
             }).toAnyView()
 
-        // DescriptionImage Screen
         case .descriptionImage(let image):
             return NavigationLink("", destination: DescriptionImageView.build(image: image),
-                                  isActive: isVisibleScreen).toAnyView()
+                                  isActive: isVisible).toAnyView()
+
+        case .exit:
+            presentationMode.wrappedValue.dismiss()
+            return EmptyView().toAnyView()
 
         case .none:
             return EmptyView().toAnyView()
@@ -58,7 +73,7 @@ struct RootRouter_Previews: PreviewProvider {
                 self.routeSubject.send(.alert(title: "Error", message: "Something went wrong"))
             }, label: { Text("Display Screen") })
         }
-        .overlay(RootRouter(screen: routeSubject))
+        .overlay(RootRouter(action: { _ in }, screen: routeSubject))
     }
 }
 #endif

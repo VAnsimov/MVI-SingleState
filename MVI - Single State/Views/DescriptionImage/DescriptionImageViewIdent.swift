@@ -19,6 +19,8 @@ class DescriptionImageViewIntent: ObservableObject {
     init(model: DescriptionImageViewModel) {
         self.model = model
         self.displayModel = model
-        cancellable.insert(model.objectWillChange.sink { self.objectWillChange.send() })
+        cancellable.insert(model.objectWillChange.sink { [weak self] in
+            DispatchQueue.main.async { self?.objectWillChange.send() }
+        })
     }
 }

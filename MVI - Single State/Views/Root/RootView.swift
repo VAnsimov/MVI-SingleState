@@ -23,7 +23,7 @@ struct RootView: View {
                 errorView()
                 loadView()
             }
-            .overlay(RootRouter(screen: intent.model.routerSubject))
+            .overlay(RootRouter(action: { _ in }, screen: intent.model.routerSubject))
             .onAppear(perform: intent.onAppear)
         }
     }
